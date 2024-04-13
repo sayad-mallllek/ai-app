@@ -66,10 +66,6 @@ export default function Completion() {
               </p>
               <ul className="list-disc list-outside space-y-1.5 ps-3.5">
                 <li className="text-sm text-gray-800 dark:text-white">
-                  What's Preline UI?
-                </li>
-
-                <li className="text-sm text-gray-800 dark:text-white">
                   How many Starter Pages & Examples are there?
                 </li>
 
