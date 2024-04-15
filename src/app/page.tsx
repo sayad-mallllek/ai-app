@@ -5,7 +5,7 @@ import FormInput from "@/components/FormInput";
 import LogoIcon from "@/components/logo-icon";
 import { useCompletion } from "ai/react";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 export default function Completion() {
