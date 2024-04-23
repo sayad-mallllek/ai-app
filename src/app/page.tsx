@@ -6,7 +6,9 @@ import LogoIcon from "@/components/logo-icon";
 import Message from "@/components/Message/message";
 import SidebarIcon from "@/components/sidebar-icon";
 import Sidebar from "@/components/Sidebar/sidebar";
+import { createClient } from "@/utils/supabase/client";
 import { useCompletion } from "ai/react";
+import { useEffect } from "react";
 
 export default function Completion() {
   const {
@@ -18,6 +20,15 @@ export default function Completion() {
     handleSubmit,
     setInput,
   } = useCompletion();
+
+  const testSupabase = async () => {
+    const supabase = createClient();
+    const { data: notes } = await supabase.from("notes").select();
+  };
+
+  useEffect(() => {
+    testSupabase();
+  }, []);
 
   const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
