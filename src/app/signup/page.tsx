@@ -2,6 +2,8 @@
 import GoogleIcon from "@/components/google-icon";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
+// useRouter
+import { permanentRedirect, redirect } from "next/navigation";
 
 const supabase = createClient();
 
@@ -30,17 +32,20 @@ async function handleSubmitForm(data: FormData) {
       email,
       password,
       options: {
-        emailRedirectTo: "/login",
+        emailRedirectTo: "/",
       },
     });
     if (error) {
       console.error("Error signing Up:", error.message);
+      return;
     } else {
       console.log("Signed Up successfully", data);
     }
   } catch (error: any) {
-    console.error("Error signing Up:", error.message);
+    console.error("Error through signing Up:", error);
+    return;
   }
+  redirect("/signup/success");
 }
 
 export default async function Login() {
@@ -117,20 +122,12 @@ export default async function Login() {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center">
-                    <label
-                      htmlFor="password"
-                      className="block text-sm mb-2 dark:text-white"
-                    >
-                      Password
-                    </label>
-                    <a
-                      className="text-sm text-blue-600 decoration-2 hover:underline font-medium"
-                      href="../examples/html/recover-account.html"
-                    >
-                      Forgot password?
-                    </a>
-                  </div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm mb-2 dark:text-white"
+                  >
+                    Password
+                  </label>
                   <div className="relative">
                     <input
                       type="password"
