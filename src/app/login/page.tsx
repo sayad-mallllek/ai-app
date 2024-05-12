@@ -1,37 +1,32 @@
-"use server";
+"use client";
 import GoogleIcon from "@/components/google-icon";
 import Input from "@/components/TextInput";
-import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
+import { handleLoginSubmitForm } from "../api/actions/login.actions";
+import { toast } from "react-toastify";
 
-const supabase = createClient();
+const initalState: {
+  errors: {
+    email?: string[];
+    password?: string[];
+    auth?: string[];
+  };
+} | null = null;
 
-async function handleSubmitForm(data: FormData) {
-  "use server";
+export default function Login() {
+  const [state, formAction] = useActionState(
+    handleLoginSubmitForm,
+    initalState
+  );
 
-  const email = data.get("email")?.toString();
-  const password = data.get("password")?.toString();
+  useEffect(() => {
+    if (state?.errors.auth)
+      toast(state?.errors?.auth?.join(", ") || "", {
+        type: "error",
+      });
+  }, [state]);
 
-  if (!email || !password)
-    return console.error("Email and password are required");
-
-  try {
-    const { error, data } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      return console.error("Error signing in:", error.message);
-    } else {
-      console.log("Signed in successfully", data);
-    }
-  } catch (error: any) {
-    return console.error("Error signing in:", error.message);
-  }
-  redirect("/");
-}
-
-export default async function Login() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-white dark:bg-slate-900">
       <div className="mt-7 max-w-[500px] grow bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-neutral-900 dark:border-neutral-700">
@@ -64,7 +59,7 @@ export default async function Login() {
               Or
             </div>
 
-            <form action={handleSubmitForm}>
+            <form action={formAction}>
               <div className="grid gap-y-4">
                 <Input
                   name="email"
@@ -84,7 +79,6 @@ export default async function Login() {
                   errorMessage="Please include a valid email address"
                   label="Password"
                 />
-
                 <button
                   type="submit"
                   className="w-full mt-7 py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"

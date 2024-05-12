@@ -1,15 +1,17 @@
 import { DetailedHTMLProps, InputHTMLAttributes } from "react";
 
-const Input = (
-  props: DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > & { errorMessage?: string; label?: string }
-) => {
-  return props.type === "password" ? (
+const Input = ({
+  errorMessage,
+  label,
+  ...props
+}: DetailedHTMLProps<
+  InputHTMLAttributes<HTMLInputElement>,
+  HTMLInputElement
+> & { errorMessage?: string; label?: string }) => {
+  return props.type !== "password" ? (
     <div>
       <label htmlFor="email" className="block text-sm mb-2 dark:text-white">
-        {props.label}
+        {label}
       </label>
       <div className="relative">
         <input
@@ -33,7 +35,7 @@ const Input = (
         className="hidden text-xs text-red-600 mt-2"
         id={props["aria-describedby"]}
       >
-        {props.errorMessage}
+        {errorMessage}
       </p>
     </div>
   ) : (
@@ -43,7 +45,7 @@ const Input = (
           htmlFor="password"
           className="block text-sm mb-2 dark:text-white"
         >
-          {props.label || "Password"}
+          {label || "Password"}
         </label>
         <a
           className="text-sm text-blue-600 decoration-2 hover:underline font-medium"

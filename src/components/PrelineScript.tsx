@@ -16,8 +16,8 @@ export default function PrelineScript() {
   useEffect(() => {
     const loadPreline = async () => {
       await import("preline/preline");
-
-      window.HSStaticMethods.autoInit();
+      console.log("HSS", window.HSStaticMethods);
+      if (window?.HSStaticMethods) window.HSStaticMethods.autoInit();
     };
 
     loadPreline();
