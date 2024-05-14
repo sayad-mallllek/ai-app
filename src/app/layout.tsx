@@ -21,9 +21,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <header>
+        <ToastContainer position="bottom-left" />
+      </header>
       <body className={inter.className}>{children}</body>
       <PrelineScript />
-      <ToastContainer position="bottom-left" />
     </html>
   );
 }

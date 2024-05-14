@@ -8,40 +8,45 @@ import { cookies } from "next/headers";
 const supabase = createClient();
 
 import { z } from "zod";
-import { FormActionSubmitType } from "@/types/auth.type";
 
-const signUpSchema = z.object({
-  email: z
-    .string({
-      invalid_type_error: "Invalid Email",
-    })
-    .email({
-      message: "Invalid Email Format",
-    }),
-  password: z
-    .string({
-      invalid_type_error: "Invalid Password",
-    })
-    .min(8, {
-      message: "Password must be at least 8 characters",
-    }),
-});
+const signUpSchema = z
+  .object({
+    email: z
+      .string({
+        invalid_type_error: "Invalid Email",
+      })
+      .email({
+        message: "Invalid Email Format",
+      }),
+    password: z
+      .string({
+        invalid_type_error: "Invalid Password",
+      })
+      .min(8, {
+        message: "Password must be at least 8 characters",
+      }),
+    confirmPassword: z
+      .string({
+        invalid_type_error: "Invalid Password",
+      })
+      .min(8, {
+        message: "Password must be at least 8 characters",
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
-const loginSchema = z.object({
-  email: z
-    .string({
-      invalid_type_error: "Invalid Email",
-    })
-    .email({
-      message: "Invalid Email Format",
-    }),
-  password: z.string({
-    invalid_type_error: "Invalid Password",
-  }),
-});
-
-export async function handleLoginSubmitForm(
-  _: FormActionSubmitType<["email", "password", "auth"]> | null | void,
+export async function handleSignupSubmitForm(
+  _: {
+    errors: {
+      email?: string[];
+      password?: string[];
+      confirmPassword?: string[];
+      auth?: string[];
+    };
+  } | null | void,
   data: FormData
 ): Promise<
   | {
@@ -58,7 +63,7 @@ export async function handleLoginSubmitForm(
   const email = data.get("email")?.toString();
   const password = data.get("password")?.toString();
 
-  const validatedFields = loginSchema.safeParse({
+  const validatedFields = signUpSchema.safeParse({
     email,
     password,
   });
