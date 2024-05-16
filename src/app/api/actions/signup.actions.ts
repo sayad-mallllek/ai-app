@@ -8,6 +8,7 @@ import { cookies } from "next/headers";
 const supabase = createClient();
 
 import { z } from "zod";
+import { FormActionSubmitType } from "@/types/auth.type";
 
 const signUpSchema = z
   .object({
@@ -39,62 +40,63 @@ const signUpSchema = z
   });
 
 export async function handleSignupSubmitForm(
-  _: {
-    errors: {
-      email?: string[];
-      password?: string[];
-      confirmPassword?: string[];
-      auth?: string[];
-    };
-  } | null | void,
+  _: FormActionSubmitType<
+    ["email", "password", "auth", "confirmPassword"]
+  > | null | void,
   data: FormData
 ): Promise<
-  | {
-      errors: {
-        email?: string[];
-        password?: string[];
-        auth?: string[];
-      };
-    }
+  | FormActionSubmitType<["email", "password", "auth", "confirmPassword"]>
   | undefined
 > {
   "use server";
 
   const email = data.get("email")?.toString();
   const password = data.get("password")?.toString();
+  const confirmPassword = data.get("confirmPassword")?.toString();
+
+  const form = {
+    email,
+    password,
+    confirmPassword,
+  };
 
   const validatedFields = signUpSchema.safeParse({
     email,
     password,
+    confirmPassword,
   });
 
   // Return early if the form data is invalid
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
+      form,
     };
   }
 
+  /* This is only done so typescript won't nag down */
   if (!email || !password)
     return {
       errors: {
         email: ["Email is required"],
         password: ["Password is required"],
       },
+      form,
     };
 
   try {
-    const { error, data } = await supabase.auth.signInWithPassword({
+    const { error, data } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: "/",
+      },
     });
     if (error) {
-      return { errors: { auth: [String(error.message)] } };
-    } else {
-      setAuthTokens(data);
+      return { errors: { auth: [String(error.message)] }, form };
     }
   } catch (error: any) {
-    return { errors: { auth: [String(error.message)] } };
+    return { errors: { auth: [String(error.message)] }, form };
   }
-  redirect("/");
+  redirect("/signup/success");
 }

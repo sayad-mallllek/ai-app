@@ -5,17 +5,14 @@ import { redirect } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { handleLoginSubmitForm } from "../api/actions/login.actions";
 import { toast } from "react-toastify";
+import { FormActionSubmitType } from "@/types/auth.type";
+import Link from "next/link";
 
-const initalState: {
-  errors: {
-    email?: string[];
-    password?: string[];
-    auth?: string[];
-  };
-} | null = null;
+const initalState: FormActionSubmitType<["email", "password", "auth"]> | null =
+  null;
 
 export default function Login() {
-  const [state, formAction] = useActionState(
+  const [state, formAction, pending] = useActionState(
     handleLoginSubmitForm,
     initalState
   );
@@ -37,12 +34,12 @@ export default function Login() {
             </h1>
             <p className="mt-2 text-sm text-gray-600 dark:text-neutral-400">
               Don't have an account yet?
-              <a
+              <Link
                 className="text-blue-600 decoration-2 hover:underline font-medium dark:text-blue-500"
                 href="/signup"
               >
                 Sign up here
-              </a>
+              </Link>
             </p>
           </div>
 
@@ -59,7 +56,16 @@ export default function Login() {
               Or
             </div>
 
-            <form action={formAction}>
+            <form
+              onSubmit={
+                pending
+                  ? (event) => {
+                      event.preventDefault();
+                    }
+                  : undefined
+              }
+              action={formAction}
+            >
               <div className="grid gap-y-4">
                 <Input
                   name="email"
@@ -67,8 +73,9 @@ export default function Login() {
                   type="email"
                   required
                   aria-describedby="email-error"
-                  errorMessage="Please include a valid email address"
+                  errorMessage={state?.errors.email?.[0]}
                   label="Email address"
+                  defaultValue={state?.form?.email}
                 />
                 <Input
                   name="password"
@@ -76,11 +83,16 @@ export default function Login() {
                   type="password"
                   required
                   aria-describedby="password-error"
-                  errorMessage="Please include a valid email address"
+                  errorMessage={state?.errors.password?.[0]}
                   label="Password"
+                  defaultValue={state?.form?.password}
                 />
                 <button
                   type="submit"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                  }}
+                  disabled={pending}
                   className="w-full mt-7 py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   Sign in

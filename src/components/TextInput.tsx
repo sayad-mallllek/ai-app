@@ -1,4 +1,5 @@
 import { DetailedHTMLProps, InputHTMLAttributes } from "react";
+import { twMerge } from "tailwind-merge";
 
 const Input = ({
   errorMessage,
@@ -10,7 +11,7 @@ const Input = ({
 > & { errorMessage?: string; label?: string }) => {
   return props.type !== "password" ? (
     <div>
-      <label htmlFor="email" className="block text-sm mb-2 dark:text-white">
+      <label htmlFor={props.id} className="block text-sm mb-2 dark:text-white">
         {label}
       </label>
       <div className="relative">
@@ -32,7 +33,10 @@ const Input = ({
         </div>
       </div>
       <p
-        className="hidden text-xs text-red-600 mt-2"
+        className={twMerge(
+          "text-xs text-red-600 mt-2",
+          !errorMessage && "hidden"
+        )}
         id={props["aria-describedby"]}
       >
         {errorMessage}
@@ -42,7 +46,7 @@ const Input = ({
     <div>
       <div className="flex justify-between items-center">
         <label
-          htmlFor="password"
+          htmlFor={props.id}
           className="block text-sm mb-2 dark:text-white"
         >
           {label || "Password"}
@@ -112,8 +116,14 @@ const Input = ({
           </svg>
         </button>
       </div>
-      <p className="hidden text-xs text-red-600 mt-2" id="password-error">
-        8+ characters required
+      <p
+        className={twMerge(
+          "text-xs text-red-600 mt-2",
+          !errorMessage && "hidden"
+        )}
+        id={`${props.id}-error`}
+      >
+        {errorMessage}
       </p>
     </div>
   );

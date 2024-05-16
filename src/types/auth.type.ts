@@ -7,4 +7,10 @@ type Mapping<
 
 export type FormActionSubmitType<T extends string[]> = {
   errors: Partial<Record<T[number], string[] | undefined | void>>;
+  form: Partial<
+    Record<
+      Exclude<T[number], "auth">,
+      string | number | readonly string[] | undefined
+    >
+  >;
 };
